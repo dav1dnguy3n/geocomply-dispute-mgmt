@@ -2,7 +2,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function TrendChart({ trends }: { trends: any }) {
-  if (!trends || !trends.byMonth || trends.byMonth.length === 0) {
+  if (!trends || !trends.byPeriod || trends.byPeriod.length === 0) {
     return <p className="text-slate-400">No resolved data yet.</p>;
   }
 
@@ -30,7 +30,7 @@ export default function TrendChart({ trends }: { trends: any }) {
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={trends.byMonth}
+          data={trends.byPeriod}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />

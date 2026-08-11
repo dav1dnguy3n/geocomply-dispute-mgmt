@@ -20,10 +20,11 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [trendPeriod, setTrendPeriod] = useState('month');
 
   const loadTrends = async () => {
     try {
-      const trendsData = await fetchTrends();
+      const trendsData = await fetchTrends(trendPeriod);
       setTrends(trendsData);
     } catch (err) {
       console.error(err);
@@ -55,6 +56,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading) {
+      loadTrends();
+    }
+  }, [trendPeriod]);
+
+  useEffect(() => {
+    if (!loading) {
       const timer = setTimeout(() => {
         loadDisputes();
       }, 300); // Debounce search
@@ -63,7 +70,7 @@ export default function Dashboard() {
   }, [page, search]);
 
   return (
-    <main className="max-w-7xl mx-auto p-6 md:p-12 space-y-8">
+    <main className="max-w:full px-8 mx-auto p-6 md:p-12 space-y-8">
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,7 +96,18 @@ export default function Dashboard() {
         >
           {/* Trend View */}
           <section className="glass-panel p-6">
-            <h2 className="text-xl font-semibold mb-6 text-white/90">Resolution Trends</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white/90">Resolution Trends</h2>
+              <select 
+                value={trendPeriod} 
+                onChange={(e) => setTrendPeriod(e.target.value)}
+                className="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              >
+                <option value="week">Weekly</option>
+                <option value="month">Monthly</option>
+                <option value="year">Yearly</option>
+              </select>
+            </div>
             <TrendChart trends={trends} />
           </section>
 

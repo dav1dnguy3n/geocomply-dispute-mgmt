@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import db, { ensureDbSeeded } from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await ensureDbSeeded();
-    
+
     // Group by outcome and region
     const stmt = db.prepare(`
       SELECT region, outcome, COUNT(*) as count 
@@ -12,12 +12,12 @@ export async function GET() {
       WHERE status = 'resolved' AND outcome IS NOT NULL AND outcome != ''
       GROUP BY region, outcome
     `);
-    
+
     const rawData = stmt.all() as any[];
-    
+
     // Transform for Recharts
     const regionsMap = new Map<string, any>();
-    
+
     for (const row of rawData) {
       if (!regionsMap.has(row.region)) {
         regionsMap.set(row.region, { name: row.region, won: 0, lost: 0, fraud_confirmed: 0 });
@@ -27,34 +27,42 @@ export async function GET() {
         item[row.outcome] = row.count;
       }
     }
-    
+
     const trendsByRegion = Array.from(regionsMap.values());
-    
-    // Monthly trends
-    const stmtMonth = db.prepare(`
-      SELECT strftime('%Y-%m', created_at) as month, outcome, COUNT(*) as count
+
+    const { searchParams } = new URL(request.url);
+    const period = searchParams.get('period') || 'month';
+
+    let timeFormat = "'%Y-%m'";
+    if (period === 'year') timeFormat = "'%Y'";
+    if (period === 'week') timeFormat = "'%Y-%W'";
+
+    const stmtTime = db.prepare(`
+      SELECT strftime(${timeFormat}, created_at) as timeLabel, outcome, COUNT(*) as count
       FROM disputes
       WHERE status = 'resolved' AND outcome IS NOT NULL AND outcome != ''
-      GROUP BY month, outcome
-      ORDER BY month ASC
+      GROUP BY timeLabel, outcome
+      ORDER BY timeLabel ASC
     `);
-    const rawMonthly = stmtMonth.all() as any[];
-    const monthlyMap = new Map<string, any>();
-    for (const row of rawMonthly) {
-      if (!monthlyMap.has(row.month)) {
-        monthlyMap.set(row.month, { name: row.month, won: 0, lost: 0, fraud_confirmed: 0 });
+
+    const rawTime = stmtTime.all() as any[];
+    const timeMap = new Map<string, any>();
+
+    for (const row of rawTime) {
+      if (!timeMap.has(row.timeLabel)) {
+        timeMap.set(row.timeLabel, { name: row.timeLabel, won: 0, lost: 0, fraud_confirmed: 0 });
       }
-      const item = monthlyMap.get(row.month);
+      const item = timeMap.get(row.timeLabel);
       if (item && item[row.outcome] !== undefined) {
         item[row.outcome] = row.count;
       }
     }
-    
-    const trendsByMonth = Array.from(monthlyMap.values());
+
+    const trendsByPeriod = Array.from(timeMap.values());
 
     return NextResponse.json({
       byRegion: trendsByRegion,
-      byMonth: trendsByMonth
+      byPeriod: trendsByPeriod
     });
   } catch (error: any) {
     console.error('Error fetching trends:', error);

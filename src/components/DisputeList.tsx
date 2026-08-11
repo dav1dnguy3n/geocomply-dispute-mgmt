@@ -27,9 +27,9 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
         {/* Search Bar */}
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search by Email, User ID, Device ID..." 
+          <input
+            type="text"
+            placeholder="Search by Email, User ID, Device ID..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-2 pl-10 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -43,14 +43,14 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
           )}
           {totalPages > 1 && (
             <div className="flex gap-2">
-              <button 
+              <button
                 onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
                 className="p-2 bg-slate-800/50 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
                 className="p-2 bg-slate-800/50 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors cursor-pointer"
@@ -68,11 +68,11 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
             <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
           </div>
         )}
-        <table className="w-full text-left text-sm whitespace-nowrap">
+        <table className="w-full table-fixed text-left text-sm whitespace-nowrap">
           <thead>
             <tr className="text-slate-400 border-b border-slate-700/50 bg-slate-800/50">
               <th className="py-3 px-4 font-medium">Case ID</th>
-              <th className="py-3 px-4 font-medium">User Email</th>
+              <th className="w-[400px] py-3 px-4 font-medium">User Email</th>
               <th className="py-3 px-4 font-medium">Device ID</th>
               <th className="py-3 px-4 font-medium">Amount</th>
               <th className="py-3 px-4 font-medium">Status</th>
@@ -82,7 +82,7 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
           <tbody>
             <AnimatePresence>
               {disputes.map(d => (
-                <motion.tr 
+                <motion.tr
                   key={d.case_id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -103,7 +103,7 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
                     )}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <button 
+                    <button
                       onClick={() => onSelectCase(d)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors text-xs font-medium shadow-lg shadow-indigo-900/20"
                     >
