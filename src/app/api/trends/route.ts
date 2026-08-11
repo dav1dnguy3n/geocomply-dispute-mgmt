@@ -7,10 +7,12 @@ export async function GET(request: Request) {
 
     // Group by outcome and region
     const stmt = db.prepare(`
-      SELECT region, outcome, COUNT(*) as count 
+      SELECT region, 
+             CASE WHEN status = 'open' THEN 'open' ELSE outcome END as outcome_group,
+             COUNT(*) as count 
       FROM disputes 
-      WHERE status = 'resolved' AND outcome IS NOT NULL AND outcome != ''
-      GROUP BY region, outcome
+      WHERE status = 'open' OR (status = 'resolved' AND outcome IS NOT NULL AND outcome != '')
+      GROUP BY region, outcome_group
     `);
 
     const rawData = stmt.all() as any[];
@@ -20,11 +22,11 @@ export async function GET(request: Request) {
 
     for (const row of rawData) {
       if (!regionsMap.has(row.region)) {
-        regionsMap.set(row.region, { name: row.region, won: 0, lost: 0, fraud_confirmed: 0 });
+        regionsMap.set(row.region, { name: row.region, open: 0, won: 0, lost: 0, fraud_confirmed: 0 });
       }
       const item = regionsMap.get(row.region);
-      if (item && item[row.outcome] !== undefined) {
-        item[row.outcome] = row.count;
+      if (item && item[row.outcome_group] !== undefined) {
+        item[row.outcome_group] = row.count;
       }
     }
 
@@ -32,16 +34,21 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || 'month';
+    const year = searchParams.get('year');
 
     let timeFormat = "'%Y-%m'";
     if (period === 'year') timeFormat = "'%Y'";
-    if (period === 'week') timeFormat = "'%Y-%W'";
+
+    const yearFilter = (period === 'month' && year) ? `AND strftime('%Y', created_at) = '${year}'` : '';
 
     const stmtTime = db.prepare(`
-      SELECT strftime(${timeFormat}, created_at) as timeLabel, outcome, COUNT(*) as count
+      SELECT strftime(${timeFormat}, created_at) as timeLabel, 
+             CASE WHEN status = 'open' THEN 'open' ELSE outcome END as outcome_group,
+             COUNT(*) as count
       FROM disputes
-      WHERE status = 'resolved' AND outcome IS NOT NULL AND outcome != ''
-      GROUP BY timeLabel, outcome
+      WHERE (status = 'open' OR (status = 'resolved' AND outcome IS NOT NULL AND outcome != ''))
+            ${yearFilter}
+      GROUP BY timeLabel, outcome_group
       ORDER BY timeLabel ASC
     `);
 
@@ -50,11 +57,11 @@ export async function GET(request: Request) {
 
     for (const row of rawTime) {
       if (!timeMap.has(row.timeLabel)) {
-        timeMap.set(row.timeLabel, { name: row.timeLabel, won: 0, lost: 0, fraud_confirmed: 0 });
+        timeMap.set(row.timeLabel, { name: row.timeLabel, open: 0, won: 0, lost: 0, fraud_confirmed: 0 });
       }
       const item = timeMap.get(row.timeLabel);
-      if (item && item[row.outcome] !== undefined) {
-        item[row.outcome] = row.count;
+      if (item && item[row.outcome_group] !== undefined) {
+        item[row.outcome_group] = row.count;
       }
     }
 

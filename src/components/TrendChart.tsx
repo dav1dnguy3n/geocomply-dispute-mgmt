@@ -1,7 +1,7 @@
 "use client";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function TrendChart({ trends }: { trends: any }) {
+export default function TrendChart({ trends, showOpenCases = true }: { trends: any, showOpenCases?: boolean }) {
   if (!trends || !trends.byPeriod || trends.byPeriod.length === 0) {
     return <p className="text-slate-400">No resolved data yet.</p>;
   }
@@ -38,7 +38,10 @@ export default function TrendChart({ trends }: { trends: any }) {
           <YAxis stroke="#94a3b8" />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
           <Legend wrapperStyle={{ paddingTop: '20px' }} />
-          <Bar dataKey="won" stackId="a" fill="#10b981" radius={[0, 0, 4, 4]} />
+          {showOpenCases && (
+            <Bar dataKey="open" stackId="a" fill="#f59e0b" radius={[0, 0, 4, 4]} />
+          )}
+          <Bar dataKey="won" stackId="a" fill="#10b981" />
           <Bar dataKey="lost" stackId="a" fill="#f43f5e" />
           <Bar dataKey="fraud_confirmed" stackId="a" fill="#a855f7" radius={[4, 4, 0, 0]} />
         </BarChart>

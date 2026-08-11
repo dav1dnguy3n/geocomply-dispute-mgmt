@@ -75,6 +75,7 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
               <th className="w-[400px] py-3 px-4 font-medium">User Email</th>
               <th className="py-3 px-4 font-medium">Device ID</th>
               <th className="py-3 px-4 font-medium">Amount</th>
+              <th className="py-3 px-4 font-medium">Created At</th>
               <th className="py-3 px-4 font-medium">Status</th>
               <th className="py-3 px-4 font-medium text-right">Action</th>
             </tr>
@@ -93,6 +94,11 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
                   <td className="py-3 px-4 text-slate-300">{d.user_email}</td>
                   <td className="py-3 px-4 text-slate-400 font-mono text-xs">{d.device_id}</td>
                   <td className="py-3 px-4 text-slate-200">{d.amount} {d.currency}</td>
+                  <td className="py-3 px-4 text-slate-400 text-xs">
+                    {new Date(d.created_at).toLocaleDateString('en-GB', {
+                      day: '2-digit', month: 'short', year: 'numeric'
+                    })}
+                  </td>
                   <td className="py-3 px-4">
                     {d.status === 'open' ? (
                       <span className="px-2 py-1 bg-amber-500/20 text-amber-400 rounded-md text-xs font-medium">Open</span>

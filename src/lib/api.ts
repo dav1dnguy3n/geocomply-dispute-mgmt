@@ -40,8 +40,9 @@ export async function updateOutcome(id: string, outcome: string, note: string) {
   return res.json();
 }
 
-export async function fetchTrends(period: string = 'month') {
-  const res = await fetch(`/api/trends?period=${period}`);
+export async function fetchTrends(period: string = 'month', year?: string) {
+  const yearQuery = year ? `&year=${year}` : '';
+  const res = await fetch(`/api/trends?period=${period}${yearQuery}`);
   if (!res.ok) throw new Error('Failed to fetch trends');
   return res.json();
 }
