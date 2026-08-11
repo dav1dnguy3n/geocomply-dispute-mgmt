@@ -12,8 +12,20 @@ export interface Dispute {
   outcome_note: string | null;
 }
 
-export async function fetchDisputes(): Promise<Dispute[]> {
-  const res = await fetch('/api/disputes');
+export interface PaginatedDisputes {
+  data: Dispute[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export async function fetchDisputes(page = 1, limit = 10, search = ''): Promise<PaginatedDisputes> {
+  const params = new URLSearchParams();
+  params.set('page', page.toString());
+  params.set('limit', limit.toString());
+  if (search) params.set('search', search);
+
+  const res = await fetch(`/api/disputes?${params.toString()}`);
   if (!res.ok) throw new Error('Failed to fetch disputes');
   return res.json();
 }
