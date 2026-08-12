@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [trendView, setTrendView] = useState<'time' | 'region'>('time');
   const [trendPeriod, setTrendPeriod] = useState('month');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [showOpenCases, setShowOpenCases] = useState(true);
@@ -111,8 +112,16 @@ export default function Dashboard() {
                   Include Open Cases
                 </label>
               </div>
-              <div className="flex items-center">
-                {trendPeriod === 'month' && (
+              <div className="flex items-center gap-4">
+                <select 
+                  value={trendView} 
+                  onChange={(e) => setTrendView(e.target.value as 'time' | 'region')}
+                  className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer font-medium"
+                >
+                  <option value="time">By Time</option>
+                  <option value="region">By Region</option>
+                </select>
+                {trendView === 'time' && trendPeriod === 'month' && (
                 <div className="flex items-center gap-3 mr-4 text-slate-300">
                   <button
                     onClick={() => setSelectedYear(y => (parseInt(y) - 1).toString())}
@@ -129,17 +138,19 @@ export default function Dashboard() {
                   </button>
                 </div>
               )}
-              <select
-                value={trendPeriod}
-                onChange={(e) => setTrendPeriod(e.target.value)}
-                className="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-              >
-                <option value="month">Monthly</option>
-                <option value="year">Yearly</option>
-              </select>
+              {trendView === 'time' && (
+                <select
+                  value={trendPeriod}
+                  onChange={(e) => setTrendPeriod(e.target.value)}
+                  className="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                >
+                  <option value="month">Monthly</option>
+                  <option value="year">Yearly</option>
+                </select>
+              )}
               </div>
             </div>
-            <TrendChart trends={trends} showOpenCases={showOpenCases} />
+            <TrendChart data={trendView === 'time' ? trends?.byPeriod : trends?.byRegion} showOpenCases={showOpenCases} />
           </section>
 
           {/* Dispute List */}
