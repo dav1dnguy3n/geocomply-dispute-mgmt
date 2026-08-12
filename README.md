@@ -30,6 +30,3 @@ This project is built using a modern fullstack architecture:
 - **Outcome Correction**: Analysts can update an already resolved case. To maintain data integrity, every update creates a record in a hidden `audit_logs` table.
 - **PII Data**: Emails and Device IDs are shown unmasked in the UI to facilitate easy searching by analysts.
 - **Pagination**: Intentionally omitted since the dataset is small (220 rows). Loading everything upfront and filtering in the client is faster and smoother.
-
-## Tests
-Basic setup is provided. You can add Jest tests if required.
