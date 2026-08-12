@@ -16,6 +16,18 @@ interface Props {
   loading: boolean;
 }
 
+const maskEmail = (email: string) => {
+  if (!email) return '';
+  const [name, domain] = email.split('@');
+  if (!domain) return email;
+  return `${name.charAt(0)}***@${domain}`;
+};
+
+const maskDeviceId = (id: string) => {
+  if (!id || id.length < 8) return '***';
+  return `${id.slice(0, 4)}...${id.slice(-4)}`;
+};
+
 export default function DisputeList({ disputes, onSelectCase, search, onSearchChange, page, totalPages, total, limit, onPageChange, loading }: Props) {
   const startRecord = total > 0 ? (page - 1) * limit + 1 : 0;
   const endRecord = Math.min(page * limit, total);
@@ -92,8 +104,12 @@ export default function DisputeList({ disputes, onSelectCase, search, onSearchCh
                   className="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors"
                 >
                   <td className="py-3 px-4 text-indigo-300 font-mono">{d.case_id}</td>
-                  <td className="py-3 px-4 text-slate-300">{d.user_email}</td>
-                  <td className="py-3 px-4 text-slate-400 font-mono text-xs">{d.device_id}</td>
+                  <td className="py-3 px-4 text-slate-300" title={d.user_email}>
+                    {maskEmail(d.user_email)}
+                  </td>
+                  <td className="py-3 px-4 text-slate-400 font-mono text-xs" title={d.device_id}>
+                    {maskDeviceId(d.device_id)}
+                  </td>
                   <td className="py-3 px-4 text-slate-200">{d.amount} {d.currency}</td>
                   <td className="py-3 px-4 text-slate-200">{d.region}</td>
                   <td className="py-3 px-4 text-slate-400 text-xs">
